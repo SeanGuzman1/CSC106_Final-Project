@@ -1,1 +1,182 @@
+//Global Variables
+var scene = 0;
 
+//---------------------OBJECTS----------------------
+
+//Khan Button code
+var Button = function(config) {
+    this.x = config.x || 0;
+    this.y = config.y || 0;
+    this.width = config.width || 150;
+    this.height = config.height || 50;
+    this.label = config.label || "Click";
+    this.onClick = config.onClick || function() {};
+};
+
+Button.prototype.draw = function() {
+    fill(89, 89, 89);
+    rect(this.x, this.y, this.width, this.height, 5);
+    fill(0, 0, 0);
+    textSize(19);
+    textAlign(CENTER, CENTER);
+    text(this.label, this.x+75, this.y+this.height/2);
+};
+
+Button.prototype.isMouseInside = function() {
+    return mouseX > this.x &&
+           mouseX < (this.x + this.width) &&
+           mouseY > this.y &&
+           mouseY < (this.y + this.height);
+};
+
+Button.prototype.handleMouseClick = function() {
+    if (this.isMouseInside()) {
+        this.onClick();
+    }
+};
+
+//BUTTON OBJECT CONSTRUCTORS
+var startButton = new Button({
+    x: 125,
+    y: 190,
+    label: "Start!",
+    onClick: function() {
+        scene = 1;
+    }
+});
+var btn2 = new Button({
+    x: 100,
+    y: 213,
+    label: "No! Click ME!",
+    onClick: function() {
+        text("Yay, you picked me!", this.x, this.y+this.height);
+    }
+});
+//----------------------------------------------------------------
+
+//BITMOJI CODE--(DEVIN A.)-----------------------------------
+var drawBody = function(xPos,yPos,size){
+    noStroke();
+    fill(0,0,0);
+    rect(xPos + 30/79 * size ,yPos + 137/79 * size,84/79 * size,68/79 * size);
+};
+
+
+var drawMouth=function(xPos,yPos,size){
+    noStroke();
+    fill(255, 255, 255);
+    arc(xPos + 72/79 * size, yPos + 115/79 * size, 34/79 * size, 27/79 * size, 15, 192);
+};
+
+var drawNose=function(xPos,yPos,size){
+    noFill();
+    stroke(0,0,0);
+    bezier(xPos + 66/79 * size, yPos + 110/79 * size, xPos + 88/79 * size, yPos + 119/79 * size, xPos + 79/79 * size, yPos + 105/79 * size, xPos + 72/79 * size, yPos + 94/79 * size);
+};
+
+var drawPupil=function(xPos,yPos,size){
+    noStroke();
+    fill(0, 0, 0);
+    ellipse(xPos + 59/79 * size,yPos + 95/79 * size,7/79 * size,6/79 * size);//Pupil
+    ellipse(xPos + 85/79 * size,yPos + 95/79 * size,7/79 * size,6/79 * size);
+};
+
+var drawEyes=function(xPos,yPos,size){
+    noStroke();
+    fill(255, 255, 255);
+    ellipse(xPos + 59/79 * size,yPos + 95/79 * size,17/79 * size,8/79 * size);
+    ellipse(xPos + 85/79 * size,yPos + 95/79 * size,17/79 * size,8/79 * size);
+    drawPupil(xPos,yPos,size);
+};
+
+var drawJaw=function(xPos,yPos,size){
+    noStroke();
+    fill(38, 29, 54);//Jaw
+    arc(xPos + 28/79 * size, yPos + 151/79 * size, 30/79 * size, 104/79 * size, -73, -21);
+    arc(xPos + 115/79 * size, yPos + 151/79 * size, 30/79 * size, 104/79 * size, -159, -101);
+};
+
+var drawHairline=function(xPos,yPos,size){
+    noStroke();
+    fill(150, 123, 72);
+    quad(xPos + 49/79 * size,yPos + 71/79 * size,xPos + 94/79 * size,yPos + 71/79 * size,xPos + 107/79 * size,yPos + 105/79 * size,xPos + 38/79 * size,yPos + 105/79 * size);
+    drawEyes(xPos,yPos,size);//Eyes are drawn here to avoid layering issues
+};
+
+var drawFace=function(xPos,yPos,size){
+    noStroke();
+    fill(150, 123, 72);
+    ellipse(xPos + 72/79 * size,yPos + 100/79 * size,79/79 * size,85/79 * size);
+    drawNose(xPos,yPos,size);
+    drawMouth(xPos,yPos,size);
+    drawJaw(xPos,yPos,size);
+};
+
+var drawEars=function(xPos,yPos,size){
+    noStroke();
+    fill(150, 123, 72);
+    ellipse(xPos + 110/79 * size,yPos + 90/79 * size,11/79 * size,21/79 * size);
+    ellipse(xPos + 33/79 * size,yPos + 90/79 * size,11/79 * size,21/79 * size);
+};
+
+var drawHair=function(xPos,yPos,size){
+    noStroke();
+    fill(40, 34, 4);
+    ellipse(xPos + 71/79 * size,yPos + 76/79 * size,72/79 * size,51/79 * size);
+    drawHairline(xPos,yPos,size);
+};
+
+var drawHat=function(xPos,yPos,size){
+    fill(0, 0, 0);
+    stroke(100,100,100);
+    arc(xPos + 71/79 * size,yPos + 69/79 * size,69/79 * size,65/79 * size,180,361);//Top of hat
+    bezier(xPos + 36/79 * size, yPos + 69/79 * size, xPos + 20/79 * size, yPos + 93/79 * size, xPos + 120/79 * size, yPos + 93/79 * size, xPos + 106/79 * size, yPos + 69/79 * size);
+        noFill();
+        arc(xPos + 70/79 * size,yPos + 69/79 * size,69/79 * size,-7/79 * size,197,366);
+};
+
+var drawBMJ=function(x,y,h){
+
+    drawBody(x,y,h);
+    drawFace(x,y,h);
+    drawEars(x,y,h);
+    drawHair(x,y,h);
+    drawHat(x,y,h);
+};
+//----------END BITMOJI CODE (DEVIN A.)-----------------------------
+
+//----------BITMOJI CODE-(SEAN G.)----------------------------------
+
+//----------END BITMOJI CODE-(SEAN G.)------------------------------
+
+var splash = function (){
+    background(38, 29, 54);
+    fill(161, 118, 0);
+    textSize(10);
+    text("Sean Guzman and Devin Almeida's", 125,110);
+    textSize(40);
+    text("Minesweeper", 200,145);
+    startButton.draw();
+    drawBMJ(239,269,50);
+    //Insert bitmoji draw here
+};
+
+mouseClicked = function() {
+    if (scene === 0) {
+        startButton.handleMouseClick();
+    }
+    else {
+    //Mouseclicked function for once the game starts, changes the clicked status of the individual tiles
+    }
+};
+
+draw = function() {
+    if (scene === 0){
+        splash();
+    }
+    else{
+    //Insert Game Code Here
+    background(255, 255, 255);
+    text("Game goes here",200,200);
+    }
+};
