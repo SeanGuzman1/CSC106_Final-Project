@@ -1,0 +1,133 @@
+var display = 0;
+var gameSize = 9;
+var bombCount = 0;
+var w = floor((width - 70) / gameSize);
+var gameOver = false;
+var firstClick;
+
+var Cell = function(xIndex, yIndex, w){ //Cell object
+    this.w = w;
+    this.xIndex = xIndex;
+    this.yIndex = yIndex;
+    this.isRevealed = false;
+    this.x = 35 + this.xIndex * this.w;
+    this.y = 55 + this.yIndex * this.w;
+    this.color = color(150, 150, 150);
+    this.surrBombs = 0;
+    if(floor(random(0, 4)) === 1){ //Random chance for a cell to be a bomb
+        this.isBomb = true;
+        this.color = color(255, 0, 0);
+        bombCount++;
+    }
+    else{
+        this.isBomb = false;
+    }
+};
+
+//--------------------MAKES THE GRID ARRAY---------------------------
+
+var gridArray = function() {
+    var yArr = [];
+    for (var i = 0; i <= gameSize; i++){
+        var xArr = [];
+        for(var j = 0; j <= gameSize; j++){
+            xArr[j] = new Cell( i, j, w);//The (35) and (55) are the gaps between the game grid and the side of the canvas
+        }
+        yArr.push(xArr);
+    }
+    return(yArr);
+};
+
+var grid = gridArray();
+//-----------------------------------------------------------------------
+Cell.prototype.perBombs = function(){
+    var numBombs = 0;
+        for(var yOff = -1; yOff < 2; yOff++){
+            for(var xOff = -1; xOff < 2; xOff++){
+                var x = this.xIndex - xOff;
+                var y = this.yIndex - yOff;
+                if (x >= 0 && x <= gameSize && y >= 0 && y <= gameSize){
+                    if(grid[x][y].isBomb === true){
+                        numBombs++;
+                    }
+                }
+            }
+        }
+    return(numBombs);    
+};
+Cell.prototype.draw = function(){
+    fill(this.color);
+    rect(this.x, this.y, this.w, this.w);
+    if(this.isRevealed === true){
+        if(this.isBomb === false){
+            this.color = color(255, 255, 255);
+            textAlign(CENTER,CENTER);
+            textSize(25);
+            fill(0 +(50*this.surrBombs), 0 + (10*this.surrBombs), (10*this.surrBombs));
+            text(this.perBombs(), this.x + w/2 , this.y + w/2);
+        }
+        if(this.isBomb === true){
+            this.color = color(200, 0, 0);
+            //Bomb image goes here
+        }
+    }
+};
+
+Cell.prototype.endGame = function(){
+    for (var i = 0; i <= gameSize; i++){
+        for(var j = 0; j <= gameSize; j++){
+            grid[j][i].isRevealed = true;
+        }   
+    }
+};
+
+
+
+Cell.prototype.show = function(){
+    if(this.isBomb === true){
+        if(firstClick === true){
+            this.isBomb = false;
+            firstClick = false;
+        }
+        
+        this.endGame();
+        //Changes the screen to the splash screen
+    }
+    else {
+        this.perBombs();
+    }
+};
+
+mouseClicked = function(){
+    if(display === 0){
+        //Button functions for start/change difficulty buttons
+        firstClick = true;
+        display = 1;//Starts the game
+    }
+    else if(display === 1){
+        var xCell = floor((mouseX - 36) / w);
+        var yCell = floor((mouseY - 55) / w);
+        grid[xCell][yCell].isRevealed = true;
+        grid[xCell][yCell].show();
+    }
+};
+
+draw = function() {
+    //println(grid[0][0].isRevealed);
+    if(display === 0){
+        fill(100, 100, 100);
+        rect(0,0,400,400);
+        fill(0, 0, 0);
+        text("TITLE", 190, 160);
+    }
+    else if (display === 1){
+        if (gameOver === true){
+            text("Game Over", 100, 20);
+        }
+        for (var k = 0; k < gameSize; k++){
+            for (var l = 0; l < gameSize; l++){
+                grid[l][k].draw();
+            }    
+        }
+    }
+};
