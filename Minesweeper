@@ -125,6 +125,182 @@ mouseClicked = function(){
         grid[xCell][yCell].show();
     }
 };
+//BITMOJI CODE--(DEVIN A.)-----------------------------------
+var drawBody = function(xPos,yPos,size){
+    noStroke();
+    fill(0,0,0);
+    rect(xPos + 30/79 * size ,yPos + 137/79 * size,84/79 * size,68/79 * size);
+};
+
+
+var drawMouth=function(xPos,yPos,size){
+    noStroke();
+    fill(255, 255, 255);
+    arc(xPos + 72/79 * size, yPos + 115/79 * size, 34/79 * size, 27/79 * size, 15, 192);
+};
+
+var drawNose=function(xPos,yPos,size){
+    noFill();
+    stroke(0,0,0);
+    bezier(xPos + 66/79 * size, yPos + 110/79 * size, xPos + 88/79 * size, yPos + 119/79 * size, xPos + 79/79 * size, yPos + 105/79 * size, xPos + 72/79 * size, yPos + 94/79 * size);
+};
+
+var drawPupil=function(xPos,yPos,size){
+    noStroke();
+    fill(0, 0, 0);
+    ellipse(xPos + 59/79 * size,yPos + 95/79 * size,7/79 * size,6/79 * size);//Pupil
+    ellipse(xPos + 85/79 * size,yPos + 95/79 * size,7/79 * size,6/79 * size);
+};
+
+var drawEyes=function(xPos,yPos,size){
+    noStroke();
+    fill(255, 255, 255);
+    ellipse(xPos + 59/79 * size,yPos + 95/79 * size,17/79 * size,8/79 * size);
+    ellipse(xPos + 85/79 * size,yPos + 95/79 * size,17/79 * size,8/79 * size);
+    drawPupil(xPos,yPos,size);
+};
+
+var drawJaw=function(xPos,yPos,size){
+    noStroke();
+    fill(38, 29, 54);//Jaw
+    arc(xPos + 28/79 * size, yPos + 151/79 * size, 30/79 * size, 104/79 * size, -73, -21);
+    arc(xPos + 115/79 * size, yPos + 151/79 * size, 30/79 * size, 104/79 * size, -159, -101);
+};
+
+var drawHairline=function(xPos,yPos,size){
+    noStroke();
+    fill(150, 123, 72);
+    quad(xPos + 49/79 * size,yPos + 71/79 * size,xPos + 94/79 * size,yPos + 71/79 * size,xPos + 107/79 * size,yPos + 105/79 * size,xPos + 38/79 * size,yPos + 105/79 * size);
+    drawEyes(xPos,yPos,size);//Eyes are drawn here to avoid layering issues
+};
+
+var drawFace=function(xPos,yPos,size){
+    noStroke();
+    fill(150, 123, 72);
+    ellipse(xPos + 72/79 * size,yPos + 100/79 * size,79/79 * size,85/79 * size);
+    drawNose(xPos,yPos,size);
+    drawMouth(xPos,yPos,size);
+    drawJaw(xPos,yPos,size);
+};
+
+var drawEars=function(xPos,yPos,size){
+    noStroke();
+    fill(150, 123, 72);
+    ellipse(xPos + 110/79 * size,yPos + 90/79 * size,11/79 * size,21/79 * size);
+    ellipse(xPos + 33/79 * size,yPos + 90/79 * size,11/79 * size,21/79 * size);
+};
+
+var drawHair=function(xPos,yPos,size){
+    noStroke();
+    fill(40, 34, 4);
+    ellipse(xPos + 71/79 * size,yPos + 76/79 * size,72/79 * size,51/79 * size);
+    drawHairline(xPos,yPos,size);
+};
+
+var drawHat=function(xPos,yPos,size){
+    fill(0, 0, 0);
+    stroke(100,100,100);
+    arc(xPos + 71/79 * size,yPos + 69/79 * size,69/79 * size,65/79 * size,180,361);//Top of hat
+    bezier(xPos + 36/79 * size, yPos + 69/79 * size, xPos + 20/79 * size, yPos + 93/79 * size, xPos + 120/79 * size, yPos + 93/79 * size, xPos + 106/79 * size, yPos + 69/79 * size);
+        noFill();
+        arc(xPos + 70/79 * size,yPos + 69/79 * size,69/79 * size,-7/79 * size,197,366);
+};
+
+var drawBMJ=function(x,y,h){
+
+    drawBody(x,y,h);
+    drawFace(x,y,h);
+    drawEars(x,y,h);
+    drawHair(x,y,h);
+    drawHat(x,y,h);
+};
+//----------END BITMOJI CODE (DEVIN A.)-----------------------------
+
+//----------BITMOJI CODE-(SEAN G.)----------------------------------
+var drawMe=function(x,y,h)
+{
+    //torso
+    fill(0, 0, 0);
+    rect(x+(h/150*45),y+(h/150*62),(h/150*71),(h/150*100),5);
+    //chest
+    fill(0, 0, 0);
+    rect(x+(h/150*41),y+(h/150*65),(h/150*78),(h/150*45),4);
+    //arm
+    fill(241,194,125);
+    rect(x+(h/150*17),y+(h/150*78),(h/150*22),(h/150*52),0);
+    fill(241,194,125);
+    rect(x+(h/150*122),y+(h/150*78),(h/150*22),(h/150*51),0);
+    //shoulder
+    fill(0, 0, 0);
+    ellipse(x+(h/150*27),y+(h/150*78),h/150*41,h/150*35);
+    fill(0, 0, 0);
+    ellipse(x+h/150*134,y+h/150*78,h/150*41,h/150*35);
+    //hand
+    fill(241,194,125);
+    ellipse(x+(h/150*28),y+(h/150*138),(h/150*24),h/150*24);
+    fill(241,194,125);  
+    ellipse(x+(h/150*134),y+(h/150*138),h/150*24,h/150*24);
+    //neck
+    fill(241,194,125);
+    rect(x+(h/150*62),y+(h/150*25),(h/150*36),(h/150*45),0);
+    //Head
+    fill(241,194,125);
+    ellipse(x+(h/150*81),y+(h/150*32),(h/150*60),h/150*66);
+    //Eye
+    fill(237, 230, 230);
+    ellipse(x+(h/150*67),y+(h/150*26),h/150*14,h/150*12);
+    fill(237, 230, 230);
+    ellipse(x+(h/150*93),y+(h/150*26),(h/150*14),h/150*12);
+    //Pupil
+    fill(118, 71, 0);
+    ellipse(x+(h/150*93),y+(h/150*25),(h/150*7),h/150*8);
+    fill(118, 71, 0);
+    ellipse(x+67*h/150,y+(h/150*25),(h/150*7),h/150*8);
+    //Eye lid
+    fill(241,194,125);
+    arc(x+(h/150*93),y+(h/150*23),(h/150*12),(h/150*10),-180,0);
+    fill(241,194,125);
+    arc(x+(h/150*67),y+(h/150*23),(h/150*12),(h/150*10),-180,0);
+    //Smile
+    fill(255, 255, 255);
+    arc(x+(h/150*81),y+(h/150*41),(h/150*24),(h/150*24),0,180);   
+    rect(x+(h/150*70),y+(h/150*41),(h/150*23),(h/150*0),0);
+    rect(x+(h/150*71),y+(h/150*46),(h/150*19),(h/150*0),0);
+    //hair
+    fill(49, 20, 0);
+    ellipse(x+50*h/150,y+0*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+60*h/150,y+0*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+55*h/150,y-6*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+70*h/150,y+0*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+65*h/150,y-11*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+78*h/150,y+0*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+76*h/150,y-8*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+112*h/150,y+0*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+102*h/150,y+0*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+106*h/150,y-7*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+92*h/150,y+0*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+93*h/150,y-11*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+88*h/150,y+0*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+81*h/150,y-14*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+114*h/150,y+12*h/150,20*h/150,20*h/150);
+    fill(49, 20, 0);
+    ellipse(x+49*h/150,y+12*h/150,20*h/150,20*h/150); 
+};
+//----------END BITMOJI CODE-(SEAN G.)------------------------------
 
 draw = function() {
     //println(grid[0][0].isRevealed);
@@ -132,7 +308,11 @@ draw = function() {
         fill(100, 100, 100);
         rect(0,0,400,400);
         fill(0, 0, 0);
-        text("TITLE", 190, 160);
+        textSize(41);
+        text("Minesweeper", 87, 153);
+        drawBMJ(-31,138,100);
+        drawMe(256,212,171);
+        
     }
     else if (display === 1){
         if (gameOver === true){
