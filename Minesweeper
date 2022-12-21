@@ -1,130 +1,21 @@
 var display = 0;
-var gameSize = 10;
+//What screen the game is currently on
+var gameSize = 16;
+//The grid size (x by x)
 var bombCount = 0;
+//Number of bombs
 var w = floor((width - 70) / gameSize);
-var gameOver = false;
+//Width of the cell, determined based off math and the number of cells contained in the grid
+var gameOver;
+//Determines if the game is over or not
 var firstClick;
+//Determines if the first click is occuring
+var flag = false;
+var cellsRevealed;
+var time = millis();
+var beginTime;
+var endTime;
 
-var Cell = function(xIndex, yIndex, w){ //Cell object
-    this.w = w;
-    this.xIndex = xIndex;
-    this.yIndex = yIndex;
-    this.isRevealed = false;
-    this.x = 35 + this.xIndex * this.w;
-    this.y = 55 + this.yIndex * this.w;
-    this.color = color(150, 150, 150);
-    this.surrBombs = 0;
-    if(floor(random(0, 4)) === 1){ //Random chance for a cell to be a bomb
-        this.isBomb = true;
-        this.color = color(255, 0, 0);
-        bombCount++;
-    }
-    else{
-        this.isBomb = false;
-    }
-};
-
-//--------------------MAKES THE GRID ARRAY---------------------------
-
-var gridArray = function() {
-    var yArr = [];
-    for (var i = 0; i < gameSize; i++){
-        var xArr = [];
-        for(var j = 0; j < gameSize; j++){
-            xArr[j] = new Cell( i, j, w);//The (35) and (55) are the gaps between the game grid and the side of the canvas
-        }
-        yArr.push(xArr);
-    }
-    return(yArr);
-};
-
-var grid = gridArray();
-//-----------------------------------------------------------------------
-Cell.prototype.perBombs = function(){
-    var numBombs = 0;
-        for(var yOff = -1; yOff < 2; yOff++){
-            for(var xOff = -1; xOff < 2; xOff++){
-                var x = this.xIndex - xOff;
-                var y = this.yIndex - yOff;
-                if (x >= 0 && x < gameSize && y >= 0 && y < gameSize){
-                    if(grid[x][y].isBomb === true){
-                        numBombs++;
-                    }
-                }
-            }
-        }
-    return(numBombs);    
-};
-Cell.prototype.draw = function(){
-    fill(this.color);
-    rect(this.x, this.y, this.w, this.w);
-    if(this.isRevealed === true){
-        if(this.isBomb === false){
-            this.color = color(255, 255, 255);
-            textAlign(CENTER,CENTER);
-            textSize(w);
-            fill(0 +(50*this.perBombs()), 0 + (10*this.perBombs()), (10*this.perBombs()));
-            text(this.perBombs(), this.x + w/2 , this.y + w/2);
-        }
-        if(this.isBomb === true){
-            this.color = color(200, 0, 0);
-            //Bomb image goes here
-        }
-    }
-};
-
-Cell.prototype.endGame = function(){
-    for (var i = 0; i < gameSize; i++){
-        for(var j = 0; j < gameSize; j++){
-            grid[j][i].isRevealed = true;
-        }   
-    }
-};
-
-Cell.prototype.show = function(){
-    if(this.isBomb === true){
-        if(firstClick === true){
-            this.isBomb = false;
-            this.show();
-            firstClick = false;
-        }
-        else{
-            this.endGame();
-        }
-        //Changes the screen to the splash screen
-    }
-    else {
-        this.isRevealed = true;
-        if(this.perBombs() === 0){
-            for(var yOff = -1; yOff < 2; yOff++){
-                for(var xOff = -1; xOff < 2; xOff++){
-                    var x = this.xIndex - xOff;
-                    var y = this.yIndex - yOff;
-                    if (x >= 0 && x < gameSize && y >= 0 && y < gameSize){
-                        if(grid[x][y].isBomb === false && grid[x][y].isRevealed === false)
-                        {
-                            grid[x][y].show();
-                        }
-                    }
-                }
-            }
-        }
-    }
-};
-
-mouseClicked = function(){
-    if(display === 0){
-        //Button functions for start/change difficulty buttons
-        firstClick = true;
-        gameOver = false;
-        display = 1;//Starts the game
-    }
-    else if(display === 1){
-        var xCell = floor((mouseX - 36) / w);
-        var yCell = floor((mouseY - 55) / w);
-        grid[xCell][yCell].show();
-    }
-};
 //BITMOJI CODE--(DEVIN A.)-----------------------------------
 var drawBody = function(xPos,yPos,size){
     noStroke();
@@ -162,7 +53,7 @@ var drawEyes=function(xPos,yPos,size){
 
 var drawJaw=function(xPos,yPos,size){
     noStroke();
-    fill(38, 29, 54);//Jaw
+    fill(255, 255, 255);//Jaw
     arc(xPos + 28/79 * size, yPos + 151/79 * size, 30/79 * size, 104/79 * size, -73, -21);
     arc(xPos + 115/79 * size, yPos + 151/79 * size, 30/79 * size, 104/79 * size, -159, -101);
 };
@@ -302,25 +193,240 @@ var drawMe=function(x,y,h)
 };
 //----------END BITMOJI CODE-(SEAN G.)------------------------------
 
-draw = function() {
-    //println(grid[0][0].isRevealed);
+//Khan Button & Functions
+var Button = function(config) {
+    this.x = config.x || 0;
+    this.y = config.y || 0;
+    this.width = config.width || 150;
+    this.height = config.height || 50;
+    this.label = config.label || "Click";
+    this.onClick = config.onClick || function() {};
+};
+
+Button.prototype.draw = function() {
+    fill(89, 89, 89);
+    rect(this.x, this.y, this.width, this.height, 5);
+    fill(0, 0, 0);
+    textSize(19);
+    textAlign(CENTER, CENTER);
+    text(this.label, this.x + this.width/2, this.y+this.height/2);
+};
+
+Button.prototype.isMouseInside = function() {
+    return mouseX > this.x &&
+           mouseX < (this.x + this.width) &&
+           mouseY > this.y &&
+           mouseY < (this.y + this.height);
+};
+
+Button.prototype.handleMouseClick = function() {
+    if (this.isMouseInside()) {
+        this.onClick();
+    }
+};
+
+
+var Cell = function(xIndex, yIndex, w){ //Cell object
+    this.w = w;
+    //Width of the cell
+    this.xIndex = xIndex;
+    //Allows the cell to track its own coordinates within the grid
+    this.yIndex = yIndex;
+    this.isRevealed = false;
+    this.x = 35 + this.xIndex * this.w;
+    //Math to determine where the cell is
+    this.y = 55 + this.yIndex * this.w;
+    this.color = color(150, 150, 150);
+    //Gives the cell a color that can be changed
+    if(floor(random(0, 8)) === 1){ 
+        //Random chance for a cell to be a bomb (About 1 in 5)
+        this.isBomb = true;
+        bombCount++;
+        //Keeps track of the number of bombs for the win condition
+    }
+    else{
+        this.isBomb = false;
+    }
+};
+
+//--------------------Makes the Grid Array--------------------------
+//2D array that holds all the objects in essentially a data grid that can be refferenced in the same way that a normal grid can by using the cells' index as their coordinates.
+var gridArray = function() {
+    var yArr = [];//
+    for (var i = 0; i < gameSize; i++){
+        //Based on the game size, the code loops a certain amount of times
+        var xArr = [];
+        for(var j = 0; j < gameSize; j++){
+            xArr[j] = new Cell( i, j, w);
+            //Makes a new cell object inside the array
+        }
+        yArr.push(xArr);
+        //Places the created cells stored in xArr into yArr, which forms the rows
+    }
+    return(yArr);
+};
+
+var grid = gridArray();
+//Executes the function and allows for the storing of the array
+
+var winCond = (grid.length * grid.length) - bombCount;
+//Establishes the win condition for the game by subtracting the amount of bombs from the total amount of cells revealed
+
+//--------------------------Cell Functions-------------------------------
+Cell.prototype.perBombs = function(){//Calculates the amount of bombs surrounding a cell
+    var numBombs = 0;
+        for(var yOff = -1; yOff < 2; yOff++){//Loop that scans all of the surrounding cells, ignoring the instances where it would have to scan outise of the grid
+            for(var xOff = -1; xOff < 2; xOff++){
+                var x = this.xIndex - xOff;
+                var y = this.yIndex - yOff;
+                if (x >= 0 && x < gameSize && y >= 0 && y < gameSize){
+                    if(grid[x][y].isBomb === true){//Increases the count of bombs inside the cell if the scanned cell is a bomb
+                        numBombs++;
+                    }
+                }
+            }
+        }
+    return(numBombs);//Gives the amount of bombs to the cell in order for it to be displayed and used for other calculations   
+};
+Cell.prototype.draw = function(){//Gives the cell its appearance
+    fill(this.color);
+    rect(this.x, this.y, this.w, this.w);
+    if(this.isRevealed === true){//Gives a different appearance if the cell is revealed
+        if(this.isBomb === false){//Normal revealed cell appearance
+            this.color = color(255, 255, 255);
+            textAlign(CENTER,CENTER);
+            textSize(w);
+            fill(0 +(50*this.perBombs()), 0 + (10*this.perBombs()), (10*this.perBombs()));//Uses the perBombs function to determine what number to display inside the cell
+            text(this.perBombs(), this.x + w/2 , this.y + w/2);
+        }
+        if(this.isBomb === true){//Gives the cell a different appearance if it is a bomb
+            this.color = color(200, 0, 0);
+        }
+    }
+};
+
+Cell.prototype.show = function(){//Makes the cell appear and contains their individual actions
+    if(this.isBomb === true){//What bombs do
+        if(firstClick === true){//If the first click is on a bomb, the bomb is no longer a bomb, this makes it impossible to lose on the first click
+            this.isBomb = false;
+            this.show();
+            firstClick = false;
+        }
+        else{//After the first click, if a bomb is clicked the game ends and all the cells are revealed
+            for (var i = 0; i < gameSize; i++){
+                for(var j = 0; j < gameSize; j++){
+                    grid[j][i].isRevealed = true;
+                }   
+            }
+            gameOver = true;
+            endTime = floor(((millis()-time)/1000).toFixed(2)) - beginTime;
+            //Determines the time at which the game ended
+        }
+    }
+    else {
+        this.isRevealed = true;
+        firstClick = false;
+        cellsRevealed++;
+        if(this.perBombs() === 0){
+            for(var yOff = -1; yOff < 2; yOff++){//Loop that scans all the cells around a cell with no bombs and reveals them and the cells around them if they also have no bombs around them
+                for(var xOff = -1; xOff < 2; xOff++){
+                    var x = this.xIndex - xOff;
+                    var y = this.yIndex - yOff;
+                    if (x >= 0 && x < gameSize && y >= 0 && y < gameSize){
+                        if(grid[x][y].isBomb === false && grid[x][y].isRevealed === false)
+                        {
+                            grid[x][y].show();
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
+//--------------------------------------------------------------------------
+var StartButton = new Button({//Start button object
+    x: 130,
+    y: 200,
+    label: "Start",
+    onClick: function() {
+        display = 1;
+        firstClick = true;
+        gameOver = false;
+        cellsRevealed = 0;
+        beginTime = floor(((millis()-time)/1000).toFixed(2));
+    }
+});
+var RestartButton = new Button({//Restart button object
+    x: 317,
+    y: 2,
+    width: 80,
+    label: "Restart",
+    onClick: function() {
+        Program.restart();
+    }
+});
+
+var mainMenuUI = function(){//Details for the main menu
+    background(255, 255, 255);
+    textSize(40);
+    textAlign(CENTER,CENTER);
+    fill(0, 0, 0);
+    text("Minesweeper", 200, 100);
+    textSize(10);
+    text("By Devin Almeida and Sean Guzman", 200, 133);
+
+    StartButton.draw();
+    drawBMJ(47,101,43);
+    drawMe(273,131,71);
+};
+
+mouseClicked = function(){
     if(display === 0){
-        fill(100, 100, 100);
-        rect(0,0,400,400);
-        fill(0, 0, 0);
-        textSize(41);
-        text("Minesweeper", 87, 153);
-        drawBMJ(-31,138,100);
-        drawMe(256,212,171);
-        
+        //For the main menu buttons
+        StartButton.handleMouseClick();
+    }
+    else if(display === 1){//If the game is running, the restart button alongside the cells can be clicked
+        RestartButton.handleMouseClick();
+        //Math to determine the cell that you are clicking on
+        var xCell = floor((mouseX - 36) / w);
+        var yCell = floor((mouseY - 55) / w);
+        if(grid[xCell][yCell].isRevealed === false){
+            grid[xCell][yCell].show();
+            //Executes the show function based on the cell that you clicked
+        }
+    }
+};
+
+draw = function() {
+    //Draws the main menu
+    if(display === 0){
+        mainMenuUI();
     }
     else if (display === 1){
-        if (gameOver === true){
-            text("Game Over", 100, 20);
+        //Game Timer
+        fill(255, 255, 255);
+        rect(3,3,57,30);
+        textSize(20);
+        textAlign(CENTER, CENTER);
+        fill(0,0,0);
+        if(gameOver === false && cellsRevealed !== winCond){
+            text(floor(((millis()-time)/1000).toFixed(2)) - beginTime,30,18);
+        }
+        else if(gameOver === true || cellsRevealed === winCond){
+            text(endTime, 30, 18);//Holds the time at which the game ends
+        }
+        RestartButton.draw();
+        //Draws the restart button
+        if (gameOver === true){//Game is lost
+            text("Game Over", 113, 20);
+        }
+        else if(cellsRevealed === winCond){//Game is won
+            text("You Win!", 100, 20);
+            
         }
         for (var k = 0; k < gameSize; k++){
             for (var l = 0; l < gameSize; l++){
-                grid[l][k].draw();
+                grid[l][k].draw();//Runs the code to draw the grid
             }    
         }
     }
